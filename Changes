@@ -1,5 +1,8 @@
 Revision history for IRC-Formatting-HTML
 
+0.09    01/10/2010
+        Verify that the color number exists
+
 0.08    10/09/2009
         Properly apply the last patch
 

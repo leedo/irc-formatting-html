@@ -13,11 +13,11 @@ IRC::Formatting::HTML - Convert raw IRC formatting to HTML
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $BOLD      = "\002",
 my $COLOR     = "\003";
@@ -167,8 +167,8 @@ sub _css_styles {
   my $self = shift;
   my ($fg, $bg) = $self->i ? ($self->bg || 0, $self->fg || 1) : ($self->fg, $self->bg);
   my $styles = {};
-  $styles->{'color'} = '#'.$COLORS[$fg] if defined $fg;
-  $styles->{'background-color'} = '#'.$COLORS[$bg] if defined $bg;
+  $styles->{'color'} = '#'.$COLORS[$fg] if defined $fg and $COLORS[$fg];
+  $styles->{'background-color'} = '#'.$COLORS[$bg] if defined $bg and $COLORS[$bg];
   $styles->{'font-weight'} = 'bold' if $self->b;
   $styles->{'text-decoration'} = 'underline' if $self->u;
   return $styles;
