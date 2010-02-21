@@ -3,8 +3,8 @@ package IRC::Formatting::HTML;
 use warnings;
 use strict;
 
-use Moose;
-use List::MoreUtils qw/natatime/;
+use IO::String;
+use Any::Moose;
 use HTML::Entities;
 
 =head1 NAME
@@ -13,11 +13,11 @@ IRC::Formatting::HTML - Convert raw IRC formatting to HTML
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 my $BOLD      = "\002",
 my $COLOR     = "\003";
@@ -92,11 +92,13 @@ Takes an irc formatted string and returns the HTML version
 sub _parse_formatted_string {
   my $line = shift;
   my @segments;
-  my $it = natatime 2, ("", split(/$FORMAT_SEQUENCE/, $line));
+  my @chunks = ("", split(/$FORMAT_SEQUENCE/, $line));
   my $formatting = IRC::Formatting::HTML->new;
-  while (my ($format_sequence, $text) = $it->()) {
+  while (scalar(@chunks)) {
+    my $format_sequence = shift(@chunks);
+    my $text = shift(@chunks);
     my $new_formatting = $formatting->_accumulate($format_sequence);
-    push @segments, [ $new_formatting, $text];
+    push @segments, [$new_formatting, $text];
   }
   return @segments;
 }

@@ -1,7 +1,14 @@
 Revision history for IRC-Formatting-HTML
 
-0.09    01/10/2010
-        Verify that the color number exists
+0.11    02/21//2010
+        Verify that the color codes exist
+        Stop using natatime to avoid growing memory
+
+0.10    12/22/2009
+        Remove POD tests
+
+0.09    12/06/2009
+        Use Any::Moose
 
 0.08    10/09/2009
         Properly apply the last patch

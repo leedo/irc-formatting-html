@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 6;
+use Test::More;
 use IRC::Formatting::HTML;
 
 my $bold = "\002Bold";
@@ -30,3 +30,5 @@ ok($html eq join "\n",
  '<span style="color: #fff;background-color: #000">Inverse</span>',
  '<span style="text-decoration: underline">Underline</span>',
  '<span style="color: #080;background-color: #f00">Color</span>'));
+
+done_testing();
