@@ -1,6 +1,22 @@
 Revision history for IRC-Formatting-HTML
 
-0.11    02/21//2010
+0.16    04/19/2010
+        Drop Any::Moose dependency
+        Use file scope for accumulated state
+
+0.15    04/15/2010
+        Small fix to avoid warning
+
+0.14    03/24/2010
+        Handle "0" and "" properly
+
+0.13    02/24/2010
+        Remove HTML::Entities dependency
+
+0.12    02/21/2010
+        Remove leftover IO::String use statement
+
+0.11    02/21/2010
         Verify that the color codes exist
         Stop using natatime to avoid growing memory
 

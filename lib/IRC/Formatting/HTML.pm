@@ -3,21 +3,17 @@ package IRC::Formatting::HTML;
 use warnings;
 use strict;
 
-use IO::String;
-use Any::Moose;
-use HTML::Entities;
-
 =head1 NAME
 
 IRC::Formatting::HTML - Convert raw IRC formatting to HTML
 
 =head1 VERSION
 
-Version 0.11
+Version 0.16
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.16';
 
 my $BOLD      = "\002",
 my $COLOR     = "\003";
@@ -37,33 +33,7 @@ my $FORMAT_SEQUENCE   = qr/(
 my @COLORS = ( qw/fff 000 008 080 f00 800 808 f80
          ff0 0f0 088 0ff 00f f0f 888 ccc/ );
 
-has 'b' => (
-  is => 'rw',
-  isa => 'Bool',
-  default => 0,
-);
-
-has 'i' => (
-  is => 'rw',
-  isa => 'Bool',
-  default => 0,
-);
-
-has 'u' => (
-  is => 'rw',
-  isa => 'Bool',
-  default => 0,
-);
-
-has 'fg' => (
-  is => 'rw',
-  isa => 'Any',
-);
-
-has 'bg' => (
-  is => 'rw',
-  isa => 'Any',
-);
+my ($b, $i, $u, $fg, $bg);
 
 =head1 SYNOPSIS
 
@@ -91,59 +61,51 @@ Takes an irc formatted string and returns the HTML version
 
 sub _parse_formatted_string {
   my $line = shift;
+  _reset();
   my @segments;
   my @chunks = ("", split(/$FORMAT_SEQUENCE/, $line));
-  my $formatting = IRC::Formatting::HTML->new;
+  $line = "";
   while (scalar(@chunks)) {
     my $format_sequence = shift(@chunks);
     my $text = shift(@chunks);
-    my $new_formatting = $formatting->_accumulate($format_sequence);
-    push @segments, [$new_formatting, $text];
+    next unless defined $text and length $text;
+    _accumulate($format_sequence);
+    $text = _encode_entities($text);
+    $text =~ s/ {2}/ &#160;/g;
+    $line .= "<span style=\""._to_css()."\">$text</span>"; 
   }
-  return @segments;
+  return $line;
 }
 
-
-sub _dup {
-  my $self = shift;
-  return bless { %$self }, ref $self;
-}
 
 sub _reset {
-  my $self = shift;
-  $self->b(0);
-  $self->i(0);
-  $self->u(0);
-  $self->fg(undef);
-  $self->bg(undef);
+  ($b, $i, $u) = (0, 0, 0);
+  undef $fg;
+  undef $bg;
 }
 
 sub _accumulate {
-  my ($self, $format_sequence) = @_;
+  my $format_sequence = shift;
   if ($format_sequence =~ /$BOLD/) {
-    $self->b(!$self->b);
+    $b = !$b;
   }
   elsif ($format_sequence =~ /$UNDERLINE/) {
-    $self->u(!$self->u);
+    $u = !$u;
   }
   elsif ($format_sequence =~ /$INVERSE/) {
-    $self->i(!$self->i);
+    $i = !$i;
   }
   elsif ($format_sequence =~ /$RESET/) {
-    $self->_reset;
+    _reset;
   }
   elsif ($format_sequence =~ /$COLOR/) {
-    my ($fg, $bg) = $self->_extract_colors_from($format_sequence);
-    $self->fg($fg);
-    $self->bg($bg);
+    ($fg, $bg) = _extract_colors_from($format_sequence);
   }
-  return $self->_dup;
 }
 
 sub _to_css {
-  my $self = shift;
   my @properties;
-  my %styles = %{ $self->_css_styles };
+  my %styles = %{ _css_styles() };
   for (keys %styles) {
     push @properties, "$_: $styles{$_}";
   }
@@ -151,50 +113,46 @@ sub _to_css {
 }
 
 sub _extract_colors_from {
-  my ($self, $format_sequence) = @_;
+  my $format_sequence = shift;
   $format_sequence = substr($format_sequence, 1);
-  my ($fg, $bg) = ($format_sequence =~ /$COLOR_SEQUENCE/);
-  if (! defined $fg) {
+  my ($_fg, $_bg) = ($format_sequence =~ /$COLOR_SEQUENCE/);
+  if (! defined $_fg) {
     return undef, undef;
   }
-  elsif (! defined $bg) {
-    return $fg, $self->bg;
+  elsif (! defined $_bg) {
+    return $_fg, $bg;
   }
   else {
-    return $fg, $bg;
+    return $_fg, $_bg;
   }
 }
 
 sub _css_styles {
-  my $self = shift;
-  my ($fg, $bg) = $self->i ? ($self->bg || 0, $self->fg || 1) : ($self->fg, $self->bg);
+  my ($_fg, $_bg) = $i ? ($bg || 0, $fg || 1) : ($fg, $bg);
   my $styles = {};
-  $styles->{'color'} = '#'.$COLORS[$fg] if defined $fg and $COLORS[$fg];
-  $styles->{'background-color'} = '#'.$COLORS[$bg] if defined $bg and $COLORS[$bg];
-  $styles->{'font-weight'} = 'bold' if $self->b;
-  $styles->{'text-decoration'} = 'underline' if $self->u;
+  $styles->{'color'} = '#'.$COLORS[$_fg] if defined $_fg and $COLORS[$_fg];
+  $styles->{'background-color'} = '#'.$COLORS[$_bg] if defined $_bg and $COLORS[$_bg];
+  $styles->{'font-weight'} = 'bold' if $b;
+  $styles->{'text-decoration'} = 'underline' if $u;
   return $styles;
 }
 
 sub formatted_string_to_html {
   my ($class, $string) = @_;
-  my @lines;
-  for (split "\n", $string) {
-    my @formatted_line = _parse_formatted_string($_);
-    my $line;
-    for (@formatted_line) {
-      my $text = encode_entities($_->[1], '<>&"');
-      if (defined $text and length $text) {
-        $text =~ s/ {2}/ &#160;/g;
-        $line .= '<span style="'.$_->[0]->_to_css.'">'.$text.'</span>'; 
-      }
-    }
-    push @lines, $line if length $line;
-  }
-  return join "\n", @lines;
+  join "\n",
+       map {_parse_formatted_string($_)}
+       split "\n", $string;
 }
 
-__PACKAGE__->meta->make_immutable;
+sub _encode_entities {
+  my $string = shift;
+  return $string unless $string;
+  $string =~ s/&/&amp;/g;
+  $string =~ s/</&lt;/g;
+  $string =~ s/>/&gt;/g;
+  $string =~ s/"/&quot;/g;
+  return $string;
+}
 
 =head1 AUTHOR
 
