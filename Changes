@@ -1,5 +1,11 @@
 Revision history for IRC-Formatting-HTML
 
+0.18    04/19/2010
+        Add irc_to_html export
+
+0.17    04/19/2010
+        Fix MANIFEST
+
 0.16    04/19/2010
         Drop Any::Moose dependency
         Use file scope for accumulated state

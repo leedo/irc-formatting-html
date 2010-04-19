@@ -3,17 +3,20 @@ package IRC::Formatting::HTML;
 use warnings;
 use strict;
 
+use Exporter 'import';
+
 =head1 NAME
 
 IRC::Formatting::HTML - Convert raw IRC formatting to HTML
 
 =head1 VERSION
 
-Version 0.16
+Version 0.18
 
 =cut
 
-our $VERSION = '0.16';
+our @EXPORT_OK = qw/irc_to_html/;
+our $VERSION = '0.18';
 
 my $BOLD      = "\002",
 my $COLOR     = "\003";
@@ -39,22 +42,22 @@ my ($b, $i, $u, $fg, $bg);
 
 Convert raw IRC formatting to HTML
 
-    use IRC::Formatting::HTML;
+    use IRC::Formatting::HTML qw/irc_to_html/;
 
     ...
 
     my $irctext = "\002\0031,2Iron & Wine";
-    my $html = IRC::Formatting::HTML->formatted_string_to_html($irctext);
+    my $html = irc_to_html($irctext);
     print $html
 
     # the above will print:
     # <span style="font-weight: bold;color: #000; background-color: #008">Iron &amp; Wine</span>
 
-=head1 METHODS
+=head1 FUNCTIONS
 
-=head2 formatted_string_to_html
+=head2 irc_to_html
 
-IRC::Formatting::HTML->formatted_string_to_html($irctext)
+irc_to_html($irctext)
 
 Takes an irc formatted string and returns the HTML version
 =cut
@@ -135,6 +138,11 @@ sub _css_styles {
   $styles->{'font-weight'} = 'bold' if $b;
   $styles->{'text-decoration'} = 'underline' if $u;
   return $styles;
+}
+
+sub irc_to_html {
+  my $string = shift;
+  return __PACKAGE__->formatted_string_to_html($string);
 }
 
 sub formatted_string_to_html {
