@@ -20,6 +20,7 @@ our $VERSION = '0.18';
 
 my $BOLD      = "\002",
 my $COLOR     = "\003";
+my $COLORM    = qr/^$COLOR/;
 my $RESET     = "\017";
 my $INVERSE   = "\026";
 my $UNDERLINE = "\037";
@@ -88,19 +89,19 @@ sub _reset {
 
 sub _accumulate {
   my $format_sequence = shift;
-  if ($format_sequence =~ /$BOLD/) {
+  if ($format_sequence eq $BOLD) {
     $b = !$b;
   }
-  elsif ($format_sequence =~ $UNDERLINE) {
+  elsif ($format_sequence eq $UNDERLINE) {
     $u = !$u;
   }
-  elsif ($format_sequence =~ $INVERSE) {
+  elsif ($format_sequence eq $INVERSE) {
     $i = !$i;
   }
-  elsif ($format_sequence =~ $RESET) {
+  elsif ($format_sequence eq $RESET) {
     _reset;
   }
-  elsif ($format_sequence =~ $COLOR) {
+  elsif ($format_sequence =~ $COLORM) {
     ($fg, $bg) = _extract_colors_from($format_sequence);
   }
 }
