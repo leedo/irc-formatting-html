@@ -66,14 +66,13 @@ sub _parse_formatted_string {
   my $line = shift;
   _reset();
   my @segments;
-  my @chunks = ("", split(/$FORMAT_SEQUENCE/, $line));
+  my @chunks = ("", split($FORMAT_SEQUENCE, $line));
   $line = "";
   while (scalar(@chunks)) {
     my $format_sequence = shift(@chunks);
     my $text = shift(@chunks);
     next unless defined $text and length $text;
     _accumulate($format_sequence);
-    $text = _encode_entities($text);
     $text =~ s/ {2}/ &#160;/g;
     $line .= "<span style=\""._to_css()."\">$text</span>"; 
   }
@@ -92,16 +91,16 @@ sub _accumulate {
   if ($format_sequence =~ /$BOLD/) {
     $b = !$b;
   }
-  elsif ($format_sequence =~ /$UNDERLINE/) {
+  elsif ($format_sequence =~ $UNDERLINE) {
     $u = !$u;
   }
-  elsif ($format_sequence =~ /$INVERSE/) {
+  elsif ($format_sequence =~ $INVERSE) {
     $i = !$i;
   }
-  elsif ($format_sequence =~ /$RESET/) {
+  elsif ($format_sequence =~ $RESET) {
     _reset;
   }
-  elsif ($format_sequence =~ /$COLOR/) {
+  elsif ($format_sequence =~ $COLOR) {
     ($fg, $bg) = _extract_colors_from($format_sequence);
   }
 }
@@ -118,7 +117,7 @@ sub _to_css {
 sub _extract_colors_from {
   my $format_sequence = shift;
   $format_sequence = substr($format_sequence, 1);
-  my ($_fg, $_bg) = ($format_sequence =~ /$COLOR_SEQUENCE/);
+  my ($_fg, $_bg) = ($format_sequence =~ $COLOR_SEQUENCE);
   if (! defined $_fg) {
     return undef, undef;
   }
@@ -149,7 +148,7 @@ sub formatted_string_to_html {
   my ($class, $string) = @_;
   join "\n",
        map {_parse_formatted_string($_)}
-       split "\n", $string;
+       split "\n", _encode_entities($string);
 }
 
 sub _encode_entities {

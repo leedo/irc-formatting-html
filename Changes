@@ -2,6 +2,7 @@ Revision history for IRC-Formatting-HTML
 
 0.18    04/19/2010
         Add irc_to_html export
+        Minor speedups
 
 0.17    04/19/2010
         Fix MANIFEST
