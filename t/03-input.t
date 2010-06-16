@@ -4,6 +4,10 @@ use Test::More;
 use IRC::Formatting::HTML qw/html_to_irc/;
 use IRC::Formatting::HTML::Common;
 
+my $nohtml = "No html here";
+my $irc = html_to_irc($nohtml);
+is($irc, $nohtml);
+
 my $bold = "<strong>Bold</strong>";
 my $irc = html_to_irc($bold);
 is($irc, $BOLD."Bold".$BOLD);

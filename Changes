@@ -1,5 +1,9 @@
 Revision history for IRC-Formatting-HTML
 
+0.19    06/16/2010
+        Removed "formatted_string_to_html", use irc_to_html instead
+        Added html_to_irc export
+
 0.18    04/19/2010
         Add irc_to_html export
         Minor speedups

@@ -18,6 +18,7 @@ sub parse {
   $irctext = "";
   _reset();
   $p->parse(shift);
+  $p->eof;
   return $irctext;
 }
 
