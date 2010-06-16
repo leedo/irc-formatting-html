@@ -3,11 +3,14 @@ package IRC::Formatting::HTML;
 use warnings;
 use strict;
 
-use Exporter 'import';
+use IRC::Formatting::HTML::Output;
+use IRC::Formatting::HTML::Input;
+
+use Exporter qw/import/;
 
 =head1 NAME
 
-IRC::Formatting::HTML - Convert raw IRC formatting to HTML
+IRC::Formatting::HTML - Convert between HTML and IRC formatting
 
 =head1 VERSION
 
@@ -15,29 +18,8 @@ Version 0.18
 
 =cut
 
-our @EXPORT_OK = qw/irc_to_html/;
-our $VERSION = '0.18';
-
-my $BOLD      = "\002",
-my $COLOR     = "\003";
-my $COLORM    = qr/^$COLOR/;
-my $RESET     = "\017";
-my $INVERSE   = "\026";
-my $UNDERLINE = "\037";
-
-my $COLOR_SEQUENCE    = qr/(\d{1,2})(?:,(\d{1,2}))?/;
-my $COLOR_SEQUENCE_NC = qr/\d{1,2}(?:,\d{1,2})?/;
-my $FORMAT_SEQUENCE   = qr/(
-      $BOLD
-    | $COLOR$COLOR_SEQUENCE_NC?  | $RESET
-    | $INVERSE
-    | $UNDERLINE)
-    /x;
-
-my @COLORS = ( qw/fff 000 008 080 f00 800 808 f80
-         ff0 0f0 088 0ff 00f f0f 888 ccc/ );
-
-my ($b, $i, $u, $fg, $bg);
+our @EXPORT = qw/irc_to_html html_to_irc/;
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -63,103 +45,19 @@ irc_to_html($irctext)
 Takes an irc formatted string and returns the HTML version
 =cut
 
-sub _parse_formatted_string {
-  my $line = shift;
-  _reset();
-  my @segments;
-  my @chunks = ("", split($FORMAT_SEQUENCE, $line));
-  $line = "";
-  while (scalar(@chunks)) {
-    my $format_sequence = shift(@chunks);
-    my $text = shift(@chunks);
-    next unless defined $text and length $text;
-    _accumulate($format_sequence);
-    $text =~ s/ {2}/ &#160;/g;
-    $line .= "<span style=\""._to_css()."\">$text</span>"; 
-  }
-  return $line;
-}
-
-
-sub _reset {
-  ($b, $i, $u) = (0, 0, 0);
-  undef $fg;
-  undef $bg;
-}
-
-sub _accumulate {
-  my $format_sequence = shift;
-  if ($format_sequence eq $BOLD) {
-    $b = !$b;
-  }
-  elsif ($format_sequence eq $UNDERLINE) {
-    $u = !$u;
-  }
-  elsif ($format_sequence eq $INVERSE) {
-    $i = !$i;
-  }
-  elsif ($format_sequence eq $RESET) {
-    _reset;
-  }
-  elsif ($format_sequence =~ $COLORM) {
-    ($fg, $bg) = _extract_colors_from($format_sequence);
-  }
-}
-
-sub _to_css {
-  my @properties;
-  my %styles = %{ _css_styles() };
-  for (keys %styles) {
-    push @properties, "$_: $styles{$_}";
-  }
-  return join ";", @properties;
-}
-
-sub _extract_colors_from {
-  my $format_sequence = shift;
-  $format_sequence = substr($format_sequence, 1);
-  my ($_fg, $_bg) = ($format_sequence =~ $COLOR_SEQUENCE);
-  if (! defined $_fg) {
-    return undef, undef;
-  }
-  elsif (! defined $_bg) {
-    return $_fg, $bg;
-  }
-  else {
-    return $_fg, $_bg;
-  }
-}
-
-sub _css_styles {
-  my ($_fg, $_bg) = $i ? ($bg || 0, $fg || 1) : ($fg, $bg);
-  my $styles = {};
-  $styles->{'color'} = '#'.$COLORS[$_fg] if defined $_fg and $COLORS[$_fg];
-  $styles->{'background-color'} = '#'.$COLORS[$_bg] if defined $_bg and $COLORS[$_bg];
-  $styles->{'font-weight'} = 'bold' if $b;
-  $styles->{'text-decoration'} = 'underline' if $u;
-  return $styles;
-}
-
 sub irc_to_html {
-  my $string = shift;
-  return __PACKAGE__->formatted_string_to_html($string);
+  return IRC::Formatting::HTML::Output::parse(shift);
 }
 
-sub formatted_string_to_html {
-  my ($class, $string) = @_;
-  join "\n",
-       map {_parse_formatted_string($_)}
-       split "\n", _encode_entities($string);
-}
+=head2 irc_to_html
 
-sub _encode_entities {
-  my $string = shift;
-  return $string unless $string;
-  $string =~ s/&/&amp;/g;
-  $string =~ s/</&lt;/g;
-  $string =~ s/>/&gt;/g;
-  $string =~ s/"/&quot;/g;
-  return $string;
+html_to_irc($html)
+
+Takes an HTML string and returns an irc formatted string
+=cut
+
+sub html_to_irc {
+  return IRC::Formatting::HTML::Input::parse(shift);
 }
 
 =head1 AUTHOR
