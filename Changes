@@ -1,5 +1,9 @@
 Revision history for IRC-Formatting-HTML
 
+0.20    06/17/2010
+        Fixed docs
+        Detect more bold and italic tags
+
 0.19    06/16/2010
         Removed "formatted_string_to_html", use irc_to_html instead
         Added html_to_irc export
