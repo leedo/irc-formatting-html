@@ -18,14 +18,14 @@ Version 0.19
 
 =cut
 
-our @EXPORT = qw/irc_to_html html_to_irc/;
+our @EXPORT_OK = qw/irc_to_html html_to_irc/;
 our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
 Convert raw IRC formatting to HTML
 
-    use IRC::Formatting::HTML qw/irc_to_html/;
+    use IRC::Formatting::HTML qw/irc_to_html html_to_irc/;
 
     ...
 
@@ -35,6 +35,15 @@ Convert raw IRC formatting to HTML
 
     # the above will print:
     # <span style="font-weight: bold;color: #000; background-color: #008">Iron &amp; Wine</span>
+
+    ...
+
+    my $html = "<b><em>Nicotine and gravy</em></b>";
+    my $irctext = html_to_irc($html);
+    print $html;
+    
+    # the above will print:
+    # \002\026Nicotine and Gravy\002\026
 
 =head1 FUNCTIONS
 
@@ -49,7 +58,7 @@ sub irc_to_html {
   return IRC::Formatting::HTML::Output::parse(shift);
 }
 
-=head2 irc_to_html
+=head2 html_to_irc
 
 html_to_irc($html)
 

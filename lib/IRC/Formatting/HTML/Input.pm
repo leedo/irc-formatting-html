@@ -54,10 +54,10 @@ sub _tag_start {
 sub _tag_end {
   my $tag = shift;
 
-  if ($tag eq "strong") {
+  if ($tag eq "strong" or $tag eq "b") {
     $irctext .= $BOLD if $b;
     $b = 0;
-  } elsif ($tag eq "em") {
+  } elsif ($tag eq "em" or $tag eq "italic") {
     $irctext .= $INVERSE if $i;
     $i = 0;
   } elsif ($tag eq "u") {

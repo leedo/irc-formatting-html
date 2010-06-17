@@ -12,9 +12,9 @@ my $newline = "first line<div>second line</div>";
 $irc = html_to_irc($newline);
 is ($irc, "first line\nsecond line");
 
-my $bold = "<strong>Bold</strong>";
+my $bold = "<strong>Bold</strong>notbold";
 $irc = html_to_irc($bold);
-is($irc, $BOLD."Bold".$BOLD);
+is($irc, $BOLD."Bold".$BOLD."notbold");
 
 my $inverse = "<em>Inverse</em>";
 $irc = html_to_irc($inverse);
