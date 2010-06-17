@@ -8,8 +8,12 @@ my $nohtml = "No html here";
 my $irc = html_to_irc($nohtml);
 is($irc, $nohtml);
 
+my $newline = "first line<div>second line</div>";
+$irc = html_to_irc($newline);
+is ($irc, "first line\nsecond line");
+
 my $bold = "<strong>Bold</strong>";
-my $irc = html_to_irc($bold);
+$irc = html_to_irc($bold);
 is($irc, $BOLD."Bold".$BOLD);
 
 my $inverse = "<em>Inverse</em>";

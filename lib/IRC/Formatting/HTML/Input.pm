@@ -36,15 +36,18 @@ sub _text {
 sub _tag_start {
   my $tag = shift;
 
-  if ($tag eq "strong") {
+  if ($tag eq "strong" or $tag eq "b") {
     $irctext .= $BOLD unless $b;
     $b = 1;
-  } elsif ($tag eq "em") {
+  } elsif ($tag eq "em" or $tag eq "italic") {
     $irctext .= $INVERSE unless $i;
     $i = 1;
   } elsif ($tag eq "u") {
     $irctext .= $UNDERLINE unless $u;
     $u = 1;
+  }
+  elsif ($tag eq "br" or $tag eq "p" or $tag eq "div") {
+    $irctext .= "\n";
   }
 }
 
