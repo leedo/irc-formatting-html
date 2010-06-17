@@ -1,5 +1,8 @@
 Revision history for IRC-Formatting-HTML
 
+0.21    06/17/2010
+        Fixed consecutive formattings in irc_to_html
+
 0.20    06/17/2010
         Fixed docs
         Detect more bold and italic tags

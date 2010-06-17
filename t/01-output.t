@@ -7,6 +7,10 @@ my $bold = "\002Bold";
 my $html = irc_to_html($bold);
 ok($html eq '<span style="font-weight: bold">Bold</span>');
 
+my $bolditalic = "\002\026Bolditalic\002\026";
+$html = irc_to_html($bolditalic);
+is ($html, '<span style="color: #fff;background-color: #000;font-weight: bold">Bolditalic</span>');
+
 my $inverse = "\026Inverse";
 $html = irc_to_html($inverse);
 ok($html eq '<span style="color: #fff;background-color: #000">Inverse</span>');

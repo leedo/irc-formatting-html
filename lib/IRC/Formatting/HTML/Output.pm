@@ -16,8 +16,8 @@ sub _parse_formatted_string {
   while (scalar(@chunks)) {
     my $format_sequence = shift(@chunks);
     my $text = shift(@chunks);
-    next unless defined $text and length $text;
     _accumulate($format_sequence);
+    next unless defined $text and length $text;
     $text =~ s/ {2}/ &#160;/g;
     $line .= "<span style=\""._to_css()."\">$text</span>"; 
   }

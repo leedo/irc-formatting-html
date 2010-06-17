@@ -39,7 +39,7 @@ sub _tag_start {
   if ($tag eq "strong" or $tag eq "b") {
     $irctext .= $BOLD unless $b;
     $b = 1;
-  } elsif ($tag eq "em" or $tag eq "italic") {
+  } elsif ($tag eq "em" or $tag eq "i") {
     $irctext .= $INVERSE unless $i;
     $i = 1;
   } elsif ($tag eq "u") {
@@ -57,7 +57,7 @@ sub _tag_end {
   if ($tag eq "strong" or $tag eq "b") {
     $irctext .= $BOLD if $b;
     $b = 0;
-  } elsif ($tag eq "em" or $tag eq "italic") {
+  } elsif ($tag eq "em" or $tag eq "i") {
     $irctext .= $INVERSE if $i;
     $i = 0;
   } elsif ($tag eq "u") {
