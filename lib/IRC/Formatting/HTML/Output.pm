@@ -3,24 +3,7 @@ package IRC::Formatting::HTML::Output;
 use warnings;
 use strict;
 
-my $BOLD      = "\002",
-my $COLOR     = "\003";
-my $COLORM    = qr/^$COLOR/;
-my $RESET     = "\017";
-my $INVERSE   = "\026";
-my $UNDERLINE = "\037";
-
-my $COLOR_SEQUENCE    = qr/(\d{1,2})(?:,(\d{1,2}))?/;
-my $COLOR_SEQUENCE_NC = qr/\d{1,2}(?:,\d{1,2})?/;
-my $FORMAT_SEQUENCE   = qr/(
-      $BOLD
-    | $COLOR$COLOR_SEQUENCE_NC?  | $RESET
-    | $INVERSE
-    | $UNDERLINE)
-    /x;
-
-my @COLORS = ( qw/fff 000 008 080 f00 800 808 f80
-         ff0 0f0 088 0ff 00f f0f 888 ccc/ );
+use IRC::Formatting::HTML::Common;
 
 my ($b, $i, $u, $fg, $bg);
 
