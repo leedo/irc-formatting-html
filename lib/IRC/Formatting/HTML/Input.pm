@@ -11,6 +11,7 @@ my $p = HTML::Parser->new(api_version => 3,
             start_h => [\&_tag_start, 'tagname'],
             end_h   => [\&_tag_end, 'tagname']);
 
+my $nbsp = chr(160);
 my ($b, $i, $u, $fg, $bg);
 my $irctext = "";
 
@@ -30,6 +31,7 @@ sub _reset {
 
 sub _text {
   my $text = shift;
+  $text =~ s/$nbsp/ /g;
   $irctext .= $text if $text;
 }
 

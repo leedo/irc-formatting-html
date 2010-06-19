@@ -36,4 +36,8 @@ my $everything = "<b><i><u>Everything</u></i></b>";
 $irc = html_to_irc($everything);
 is($irc, $BOLD.$INVERSE.$UNDERLINE."Everything".$UNDERLINE.$INVERSE.$BOLD);
 
+my $nbsp = "&nbsp;<b>some text</b>";
+$irc = html_to_irc($nbsp);
+is($irc, " ".$BOLD."some text".$BOLD);
+
 done_testing();
