@@ -1,5 +1,9 @@
 Revision history for IRC-Formatting-HTML
 
+0.23    06/26/2010
+        Fixed an issue with tokens that evaluate to false
+        (e.g. "0")
+
 0.22    06/19/2010
         Handle &nbsp;
 

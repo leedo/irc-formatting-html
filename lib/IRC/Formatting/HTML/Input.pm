@@ -32,7 +32,7 @@ sub _reset {
 sub _text {
   my $text = shift;
   $text =~ s/$nbsp/ /g;
-  $irctext .= $text if $text;
+  $irctext .= $text if defined $text and length $text;
 }
 
 sub _tag_start {

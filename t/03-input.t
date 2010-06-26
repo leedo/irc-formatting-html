@@ -40,4 +40,8 @@ my $nbsp = "&nbsp;<b>some text</b>";
 $irc = html_to_irc($nbsp);
 is($irc, " ".$BOLD."some text".$BOLD);
 
+my $false_char = "0 hello";
+$irc = html_to_irc($false_char);
+is ($irc, "0 hello");
+
 done_testing();

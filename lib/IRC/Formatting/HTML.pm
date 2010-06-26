@@ -14,12 +14,12 @@ IRC::Formatting::HTML - Convert between HTML and IRC formatting
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
 our @EXPORT_OK = qw/irc_to_html html_to_irc/;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
