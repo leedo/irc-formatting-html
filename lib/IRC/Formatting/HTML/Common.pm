@@ -8,7 +8,7 @@ use Exporter 'import';
 our @EXPORT = qw/$BOLD $COLORM $RESET $INVERSE $UNDERLINE
                 $COLOR_SEQUENCE $FORMAT_SEQUENCE @COLORS/;
 
-our @EXPORT_OK = qw/html_color_to_irc color_distance hex_color_to_dec/;
+our @EXPORT_OK = qw/html_color_to_irc color_distance hex_color_to_dec rgb_str_to_dec/;
 
 our $BOLD      = "\002",
 our $COLOR     = "\003";
@@ -33,7 +33,12 @@ my @colors_dec = do { map {hex_color_to_dec($_)} @COLORS };
 
 sub html_color_to_irc {
   my $color = shift;
-  my $rgb = hex_color_to_dec($color);
+  my $rgb;
+  if ($color =~ /^#?[a-f0-9]+$/i) {
+    $rgb = hex_color_to_dec($color);
+  } elsif ($color =~ /^rgb/) {
+    $rgb = rgb_str_to_dec($color);
+  }
   my ($closest, $dist) = (1, 500);
   for my $i (0 .. @colors_dec - 1) {
     my $_rgb = $colors_dec[$i];
@@ -55,6 +60,14 @@ sub color_distance {
     $distance += ($_b - $_a) ** 2;
   }
   return (int (sqrt($distance) * 10)) / 10;
+}
+
+sub rgb_str_to_dec {
+  my $color = shift;
+  if ($color =~ /^rgba? \s* \( \s* (\d+) \s* , \s* (\d+) \s* , \s* (\d+) \s* \)/xi) {
+    return [$1, $2, $3];
+  }
+  return ();
 }
 
 sub hex_color_to_dec {
