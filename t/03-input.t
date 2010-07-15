@@ -40,6 +40,10 @@ my $nbsp = "&nbsp;<b>some text</b>";
 $irc = html_to_irc($nbsp);
 is($irc, " ".$BOLD."some text".$BOLD);
 
+my $colored = "<span style='color:#ddd'>some <span style='color:#fff'>text</span></span> heh";
+$irc = html_to_irc($colored);
+is($irc, $COLOR."15some ".$COLOR."00text".$COLOR."15$COLOR heh");
+
 my $false_char = "0 hello";
 $irc = html_to_irc($false_char);
 is ($irc, "0 hello");

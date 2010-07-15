@@ -5,7 +5,7 @@ use strict;
 
 use Exporter 'import';
 
-our @EXPORT = qw/$BOLD $COLORM $RESET $INVERSE $UNDERLINE
+our @EXPORT = qw/$BOLD $COLOR $COLORM $RESET $INVERSE $UNDERLINE
                 $COLOR_SEQUENCE $FORMAT_SEQUENCE @COLORS/;
 
 our @EXPORT_OK = qw/html_color_to_irc color_distance hex_color_to_dec rgb_str_to_dec/;
@@ -39,6 +39,9 @@ sub html_color_to_irc {
   } elsif ($color =~ /^rgb/) {
     $rgb = rgb_str_to_dec($color);
   }
+
+  return () unless $rgb;
+
   my ($closest, $dist) = (1, 500);
   for my $i (0 .. @colors_dec - 1) {
     my $_rgb = $colors_dec[$i];
