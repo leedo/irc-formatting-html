@@ -54,7 +54,7 @@ sub color_distance {
     my $_b = $b->[$_];
     $distance += ($_b - $_a) ** 2;
   }
-  return sqrt $distance;
+  return (int (sqrt($distance) * 10)) / 10;
 }
 
 sub hex_color_to_dec {
