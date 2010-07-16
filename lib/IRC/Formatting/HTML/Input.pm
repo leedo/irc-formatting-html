@@ -94,6 +94,14 @@ sub _tag_start {
     }
   }
 
+  if ($attr->{color}) {
+    my $color = IRC::Formatting::HTML::Common::html_color_to_irc($attr->{color});
+    if ($color) {
+      $state->{fg} = $color;
+      $irctext .= $COLOR.$color;
+    }
+  }
+
   if ($tag eq "strong" or $tag eq "b" or $tag =~ /^h\d$/) {
     $irctext .= $BOLD unless $state->{b};
     $state->{b} = 1;

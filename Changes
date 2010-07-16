@@ -1,5 +1,8 @@
 Revision history for IRC-Formatting-HTML
 
+0.26    07/15/2010
+        Handle color HTML attribute
+
 0.25    07/15/2010
         Handle block elements better
 

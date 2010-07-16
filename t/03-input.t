@@ -52,6 +52,10 @@ my $h2_newline = "<h2>Headline</h2>\n<p>what the what</p>";
 $irc = html_to_irc($h2_newline);
 is $irc, $BOLD."Headline".$BOLD."\nwhat the what";
 
+my $fonttag = '<FONT COLOR="#FF0000">t</FONT><FONT COLOR="#FFff00">e</FONT><FONT COLOR="#00ff00">s</FONT><FONT COLOR="#00ffff">t</FONT>';
+$irc = html_to_irc($fonttag);
+is $irc, $COLOR."04t".$COLOR.$COLOR."08e".$COLOR.$COLOR."09s".$COLOR.$COLOR."11t".$COLOR;
+
 my $false_char = "0 hello";
 $irc = html_to_irc($false_char);
 is ($irc, "0 hello");
