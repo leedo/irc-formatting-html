@@ -22,6 +22,7 @@ sub parse {
   $html =~ s/\n//;
   $p->parse($html);
   $p->eof;
+  $irctext =~ s/\n{2,}/\n/;
   $irctext =~ s/^\n+//;
   $irctext =~ s/\n+$//;
   return $irctext;
@@ -113,15 +114,15 @@ sub _tag_end {
   my $prev = shift @states;
   my $next = $states[0];
 
-  if ($tag eq "p" or $tag eq "div" or $tag =~ /^h[\dr]$/) {
-    $irctext .= "\n";
-  }
-
   $irctext .= $BOLD if $next->{b} ne $prev->{b};
   $irctext .= $INVERSE if $next->{i} ne $prev->{i};
   $irctext .= $UNDERLINE if $next->{u} ne $prev->{u};
   $irctext .= $COLOR.$next->{fg} if $next->{fg} ne $prev->{fg};
   $irctext .= $COLOR.$next->{bg} if $next->{bg} ne $prev->{bg};
+
+  if ($tag eq "p" or $tag eq "div" or $tag =~ /^h[\dr]$/) {
+    $irctext .= "\n";
+  }
 }
 
 1
