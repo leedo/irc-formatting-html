@@ -12,7 +12,7 @@ my $p = HTML::Parser->new(api_version => 3,
             end_h   => [\&_tag_end, 'tagname']);
 
 my $nbsp = chr(160);
-my ($b, $i, $u, @fg, @bg);
+my @states;
 my $irctext = "";
 
 sub parse {
@@ -24,9 +24,13 @@ sub parse {
 }
 
 sub _reset {
-  ($b, $i, $u) = (0, 0, 0);
-  @fg = ();
-  @bg = ();
+  @states = ({
+    b => 0,
+    i => 0,
+    u => 0,
+    fg => "",
+    bg => "",
+  });
 }
 
 sub _text {
@@ -35,58 +39,78 @@ sub _text {
   $irctext .= $text if defined $text and length $text;
 }
 
+sub clone {
+  my $state = $states[0];
+  return {
+    b => $state->{b},
+    i => $state->{i},
+    u => $state->{u},
+    fg => $state->{fg},
+    bg => $state->{bg},
+  };
+}
+
 sub _tag_start {
   my ($tag, $attr) = @_;
 
-  my $fg = $fg[0];
+  my $state = clone();
 
-  if ($attr->{style} and $attr->{style} =~ /(?:^|;\s*)color:\s*([^;"]+)/) {
-    my $color = IRC::Formatting::HTML::Common::html_color_to_irc($1);
-    if ($color) {
-      $fg = $color;
-      $irctext .= $COLOR.$fg;
+  if ($attr->{style}) {
+    if ($attr->{style} =~ /(?:^|;\s*)color:\s*([^;"]+)/) {
+      my $color = IRC::Formatting::HTML::Common::html_color_to_irc($1);
+      if ($color) {
+        $state->{fg} = $color;
+        $irctext .= $COLOR.$color;
+      }
+    }
+    if ($attr->{style} =~ /font-weight:\s*bold/) {
+      $irctext .= $BOLD unless $state->{b};
+      $state->{b} = 1;
+    }
+    if ($attr->{style} =~ /font-style:\s*italic/) {
+      $irctext .= $INVERSE unless $state->{i};
+      $state->{i} = 1;
+    }
+    if ($attr->{style} =~ /text-decoration:\s*underline/) {
+      $irctext .= $UNDERLINE unless $state->{u};
+      $state->{u} = 1;
+    }
+    if ($attr->{style} =~ /background-color:\s*([^;"]+)/) {
+      my $color = IRC::Formatting::HTML::Common::html_color_to_irc($1);
+      if ($color) {
+        $state->{bg} = $color;
+        $irctext .= $COLOR.$color;
+      }
+
     }
   }
-  push @fg, $fg;
 
   if ($tag eq "strong" or $tag eq "b") {
-    $irctext .= $BOLD unless $b;
-    $b = 1;
+    $irctext .= $BOLD unless $state->{b};
+    $state->{b} = 1;
   } elsif ($tag eq "em" or $tag eq "i") {
-    $irctext .= $INVERSE unless $i;
-    $i = 1;
+    $irctext .= $INVERSE unless $state->{i};
+    $state->{i} = 1;
   } elsif ($tag eq "u") {
-    $irctext .= $UNDERLINE unless $u;
-    $u = 1;
+    $irctext .= $UNDERLINE unless $state->{u};
+    $state->{u} = 1;
   }
   elsif ($tag eq "br" or $tag eq "p" or $tag eq "div") {
     $irctext .= "\n";
   }
+
+  unshift @states, $state;
 }
 
 sub _tag_end {
-  my ($tag, $attr) = @_;
+  my $prev = shift @states;
+  my $next = $states[0];
 
-  if ($tag eq "strong" or $tag eq "b") {
-    $irctext .= $BOLD if $b;
-    $b = 0;
-  } elsif ($tag eq "em" or $tag eq "i") {
-    $irctext .= $INVERSE if $i;
-    $i = 0;
-  } elsif ($tag eq "u") {
-    $irctext .= $UNDERLINE if $u;
-    $u = 0;
-  }
-
-  my $fg = pop @fg;
-  $fg = "" unless defined $fg;
-
-  my $next = $fg[0];
-  $next = "" unless defined $next;
-
-  if ($fg ne $next) {
-    $irctext .= $COLOR.$next;
-  }
+  $irctext .= $BOLD if $next->{b} ne $prev->{b};
+  $irctext .= $INVERSE if $next->{i} ne $prev->{i};
+  $irctext .= $UNDERLINE if $next->{u} ne $prev->{u};
+  $irctext .= $COLOR.$next->{fg} if $next->{fg} ne $prev->{fg};
+  $irctext .= $COLOR.$next->{bg} if $next->{bg} ne $prev->{bg};
 }
 
 1

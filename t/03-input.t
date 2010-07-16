@@ -44,6 +44,10 @@ my $colored = "<span style='color:#ddd'>some <span style='color:#fff'>text</span
 $irc = html_to_irc($colored);
 is($irc, $COLOR."15some ".$COLOR."00text".$COLOR."15$COLOR heh");
 
+my $big_color = '<span class="Apple-style-span" style="color: rgb(51, 51, 51); font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 16px; white-space: normal; font-weight: bold; "><span class="ars-features" style="color: rgb(248, 84, 1); background-image: url(http://static.arstechnica.com//public/v6/styles/light/images/sidebar/misc-icons-sprite.png); background-attachment: initial; background-origin: initial; background-clip: initial; background-color: initial; padding-left: 16px; background-position: 0px -298px; background-repeat: no-repeat no-repeat; ">Ars Technica Features:</span>Browse our latest in-depth, full-length stories.</span>';
+$irc = html_to_irc($big_color);
+is $irc, $COLOR."01".$BOLD.$COLOR."07Ars Technica Features:".$COLOR."01Browse our latest in-depth, full-length stories.$BOLD$COLOR";
+
 my $false_char = "0 hello";
 $irc = html_to_irc($false_char);
 is ($irc, "0 hello");
