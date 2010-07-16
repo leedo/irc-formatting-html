@@ -18,8 +18,12 @@ my $irctext = "";
 sub parse {
   $irctext = "";
   _reset();
-  $p->parse(shift);
+  my $html = shift;
+  $html =~ s/\n//;
+  $p->parse($html);
   $p->eof;
+  $irctext =~ s/^\n+//;
+  $irctext =~ s/\n+$//;
   return $irctext;
 }
 
@@ -55,6 +59,10 @@ sub _tag_start {
 
   my $state = clone();
 
+  if ($tag eq "br" or $tag eq "p" or $tag eq "div" or $tag =~ /^h[\dr]$/) {
+    $irctext .= "\n";
+  }
+
   if ($attr->{style}) {
     if ($attr->{style} =~ /(?:^|;\s*)color:\s*([^;"]+)/) {
       my $color = IRC::Formatting::HTML::Common::html_color_to_irc($1);
@@ -85,7 +93,7 @@ sub _tag_start {
     }
   }
 
-  if ($tag eq "strong" or $tag eq "b") {
+  if ($tag eq "strong" or $tag eq "b" or $tag =~ /^h\d$/) {
     $irctext .= $BOLD unless $state->{b};
     $state->{b} = 1;
   } elsif ($tag eq "em" or $tag eq "i") {
@@ -95,16 +103,19 @@ sub _tag_start {
     $irctext .= $UNDERLINE unless $state->{u};
     $state->{u} = 1;
   }
-  elsif ($tag eq "br" or $tag eq "p" or $tag eq "div") {
-    $irctext .= "\n";
-  }
 
   unshift @states, $state;
 }
 
 sub _tag_end {
+  my $tag = shift;
+
   my $prev = shift @states;
   my $next = $states[0];
+
+  if ($tag eq "p" or $tag eq "div" or $tag =~ /^h[\dr]$/) {
+    $irctext .= "\n";
+  }
 
   $irctext .= $BOLD if $next->{b} ne $prev->{b};
   $irctext .= $INVERSE if $next->{i} ne $prev->{i};

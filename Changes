@@ -1,5 +1,12 @@
 Revision history for IRC-Formatting-HTML
 
+0.25    07/15/2010
+        Handle block elements better
+
+0.24    07/15/2010
+        Handle colors from HTML input
+        More accurate html to irc conversion
+
 0.23    06/26/2010
         Fixed an issue with tokens that evaluate to false
         (e.g. "0")
