@@ -60,4 +60,8 @@ my $false_char = "0 hello";
 $irc = html_to_irc($false_char);
 is ($irc, "0 hello");
 
+my $bgcolor = '<span style="background-color: rgb(255, 246, 169);">started following</span>';
+$irc = html_to_irc($bgcolor);
+is $irc, $COLOR."01,15started following".$COLOR;
+
 done_testing();

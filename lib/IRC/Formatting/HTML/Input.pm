@@ -88,9 +88,9 @@ sub _tag_start {
       my $color = IRC::Formatting::HTML::Common::html_color_to_irc($1);
       if ($color) {
         $state->{bg} = $color;
-        $irctext .= $COLOR.$color;
+        my $fg = length $state->{fg} ? $state->{fg} : "01";
+        $irctext .= $COLOR."$fg,$color";
       }
-
     }
   }
 
