@@ -64,4 +64,9 @@ my $bgcolor = '<span style="background-color: rgb(255, 246, 169);">started follo
 $irc = html_to_irc($bgcolor);
 is $irc, $COLOR."01,15started following".$COLOR;
 
+my $fg_bg_color = '<span style="color: #fff"><span style="background-color: rgb(255, 246, 169);">started following</span></span>';
+$irc = html_to_irc($fg_bg_color);
+is $irc, $COLOR."00".$COLOR."00,15started following".$COLOR."00".$COLOR;
+
+
 done_testing();

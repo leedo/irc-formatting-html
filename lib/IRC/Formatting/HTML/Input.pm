@@ -70,6 +70,7 @@ sub _tag_start {
       if ($color) {
         $state->{fg} = $color;
         $irctext .= $COLOR.$color;
+        $irctext .=",$state->{bg}" if length $state->{bg};
       }
     }
     if ($attr->{style} =~ /font-weight:\s*bold/) {
@@ -99,6 +100,7 @@ sub _tag_start {
     if ($color) {
       $state->{fg} = $color;
       $irctext .= $COLOR.$color;
+      $irctext .=",$state->{bg}" if length $state->{bg};
     }
   }
 
@@ -125,8 +127,23 @@ sub _tag_end {
   $irctext .= $BOLD if $next->{b} ne $prev->{b};
   $irctext .= $INVERSE if $next->{i} ne $prev->{i};
   $irctext .= $UNDERLINE if $next->{u} ne $prev->{u};
-  $irctext .= $COLOR.$next->{fg} if $next->{fg} ne $prev->{fg};
-  $irctext .= $COLOR.$next->{bg} if $next->{bg} ne $prev->{bg};
+
+  if ($next->{fg} ne $prev->{fg} or $next->{bg} ne $prev->{bg}) {
+    $irctext .= $COLOR;
+
+    my ($fg, $bg) = ("","");
+    
+    if (length $next->{fg}) {
+      $fg = $next->{fg};
+    }
+    if (length $next->{bg}) {
+      $bg = $next->{bg};
+      $fg = "01" unless length $fg;
+    }
+
+    $irctext .= $fg;
+    $irctext .= ",$bg" if length $bg;
+  }
 
   if ($tag eq "p" or $tag eq "div" or $tag =~ /^h[\dr]$/) {
     $irctext .= "\n";
