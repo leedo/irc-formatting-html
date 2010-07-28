@@ -6,6 +6,7 @@ use strict;
 use IRC::Formatting::HTML::Common;
 
 my ($b, $i, $u, $fg, $bg);
+my $italic_invert = 0;
 
 sub _parse_formatted_string {
   my $line = shift;
@@ -75,8 +76,22 @@ sub _extract_colors_from {
 }
 
 sub _css_styles {
-  my ($_fg, $_bg) = $i ? ($bg || 0, $fg || 1) : ($fg, $bg);
   my $styles = {};
+
+  my ($_fg, $_bg);
+
+  # italicize inverted text if that option is set
+  if ($i) {
+    if ($italic_invert) {
+      $styles->{'font-style'} = 'italic';
+      ($_fg, $_bg) = ($fg, $bg);
+    } else {
+      ($_fg, $_bg) = ($bg || 0, $fg || 1);
+    }
+  } else {
+    ($_fg, $_bg) = ($fg, $bg);
+  }
+
   $styles->{'color'} = '#'.$COLORS[$_fg] if defined $_fg and $COLORS[$_fg];
   $styles->{'background-color'} = '#'.$COLORS[$_bg] if defined $_bg and $COLORS[$_bg];
   $styles->{'font-weight'} = 'bold' if $b;
@@ -85,10 +100,17 @@ sub _css_styles {
 }
 
 sub parse {
-  my $string = shift;
-  join "\n",
+  my ($string, $italic) = @_;
+
+  $italic_invert = 1 if $italic;
+
+  my $text = join "\n",
        map {_parse_formatted_string($_)}
        split "\n", _encode_entities($string);
+
+  $italic_invert = 0;
+
+  return $text;
 }
 
 sub _encode_entities {

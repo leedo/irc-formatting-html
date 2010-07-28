@@ -7,13 +7,17 @@ my $bold = "\002Bold";
 my $html = irc_to_html($bold);
 ok($html eq '<span style="font-weight: bold">Bold</span>');
 
-my $bolditalic = "\002\026Bolditalic\002\026";
-$html = irc_to_html($bolditalic);
-is ($html, '<span style="color: #fff;background-color: #000;font-weight: bold">Bolditalic</span>');
+my $boldinverse = "\002\026Boldinverse\002\026";
+$html = irc_to_html($boldinverse);
+is ($html, '<span style="color: #fff;background-color: #000;font-weight: bold">Boldinverse</span>');
 
 my $inverse = "\026Inverse";
 $html = irc_to_html($inverse);
 ok($html eq '<span style="color: #fff;background-color: #000">Inverse</span>');
+
+my $italic = "\026Italic";
+$html = irc_to_html($italic, invert => "italic");
+is $html, '<span style="font-style: italic">Italic</span>';
 
 my $underline = "\037Underline";
 $html = irc_to_html($underline);
@@ -22,6 +26,11 @@ ok($html eq '<span style="text-decoration: underline">Underline</span>');
 my $color = "\0033,4Color";
 $html = irc_to_html($color);
 ok($html eq '<span style="color: #080;background-color: #f00">Color</span>');
+
+my $italiccolor = "\026\0033,4Color";
+$html = irc_to_html($italiccolor, invert => "italic");
+is $html, '<span style="color: #080;background-color: #f00;font-style: italic">Color</span>';
+
 
 my $everything = "$bold$inverse$underline$color";
 $html = irc_to_html($everything);
