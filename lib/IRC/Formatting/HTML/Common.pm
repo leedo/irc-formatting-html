@@ -8,7 +8,7 @@ use Exporter 'import';
 our @EXPORT = qw/$BOLD $COLOR $COLORM $RESET $INVERSE $UNDERLINE
                 $COLOR_SEQUENCE $FORMAT_SEQUENCE @COLORS/;
 
-our @EXPORT_OK = qw/html_color_to_irc color_distance hex_color_to_dec rgb_str_to_dec/;
+our @EXPORT_OK = qw/html_color_to_irc color_distance hex_color_to_dec rgb_str_to_dec style_tag/;
 
 our $BOLD      = "\002",
 our $COLOR     = "\003";
@@ -90,6 +90,22 @@ sub hex_color_to_dec {
   }
   
   return ();
+}
+
+sub style_tag {
+  my $style = "<style type=\"text/css\">\n"
+            . " .bold { font-weight: bold }\n"
+            . " .ul { text-decoration: underline }\n"
+            . " .italic { font-style: italic }\n";
+            
+  for (@COLORS) {
+    $style .= " .fg-$_ { color: #$_; }\n";
+    $style .= " .bg-$_ { background-color: #$_; }\n";
+  }
+
+  $style .= "</style>";
+
+  return $style;
 }
 
 1;

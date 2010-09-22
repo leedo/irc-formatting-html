@@ -58,7 +58,8 @@ to treat inverted text as italic text.
 sub irc_to_html {
   my ($text, %options) = @_;
   my $italic = ($options{invert} and $options{invert} eq "italic");
-  return IRC::Formatting::HTML::Output::parse($text, $italic);
+  my $classes = $options{classes};
+  return IRC::Formatting::HTML::Output::parse($text, $italic, $classes);
 }
 
 =head2 html_to_irc

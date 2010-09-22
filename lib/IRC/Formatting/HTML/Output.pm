@@ -7,6 +7,7 @@ use IRC::Formatting::HTML::Common;
 
 my ($b, $i, $u, $fg, $bg);
 my $italic_invert = 0;
+my $use_classes = 0;
 
 sub _parse_formatted_string {
   my $line = shift;
@@ -20,7 +21,11 @@ sub _parse_formatted_string {
     _accumulate($format_sequence);
     next unless defined $text and length $text;
     $text =~ s/ {2}/ &#160;/g;
-    $line .= "<span style=\""._to_css()."\">$text</span>"; 
+    if ($use_classes) {
+      $line .= "<span class=\"" . _to_classes()."\">$text</span>";
+    } else {
+      $line .= "<span style=\"" . _to_css()."\">$text</span>"; 
+    }
   }
   return $line;
 }
@@ -51,15 +56,6 @@ sub _accumulate {
   }
 }
 
-sub _to_css {
-  my @properties;
-  my %styles = %{ _css_styles() };
-  for (keys %styles) {
-    push @properties, "$_: $styles{$_}";
-  }
-  return join ";", @properties;
-}
-
 sub _extract_colors_from {
   my $format_sequence = shift;
   $format_sequence = substr($format_sequence, 1);
@@ -75,15 +71,15 @@ sub _extract_colors_from {
   }
 }
 
-sub _css_styles {
-  my $styles = {};
+sub _to_css {
+  my $styles = "";
 
   my ($_fg, $_bg);
 
   # italicize inverted text if that option is set
   if ($i) {
     if ($italic_invert) {
-      $styles->{'font-style'} = 'italic';
+      $styles .= "font-style: italic;";
       ($_fg, $_bg) = ($fg, $bg);
     } else {
       ($_fg, $_bg) = ($bg || 0, $fg || 1);
@@ -92,35 +88,61 @@ sub _css_styles {
     ($_fg, $_bg) = ($fg, $bg);
   }
 
-  $styles->{'color'} = '#'.$COLORS[$_fg] if defined $_fg and $COLORS[$_fg];
-  $styles->{'background-color'} = '#'.$COLORS[$_bg] if defined $_bg and $COLORS[$_bg];
-  $styles->{'font-weight'} = 'bold' if $b;
-  $styles->{'text-decoration'} = 'underline' if $u;
+  $styles .= "color: #$COLORS[$_fg];" if defined $_fg and $COLORS[$_fg];
+  $styles .= "background-color: #$COLORS[$_bg];" if defined $_bg and $COLORS[$_bg];
+  $styles .= "font-weight: bold;" if $b;
+  $styles .= "text-decoration: underline;" if $u;
   return $styles;
 }
 
+sub _to_classes {
+  my @classes;
+
+  my ($_fg, $_bg);
+
+  # italicize inverted text if that option is set
+  if ($i) {
+    if ($italic_invert) {
+      push @classes, "italic";
+      ($_fg, $_bg) = ($fg, $bg);
+    } else {
+      ($_fg, $_bg) = ($bg || 0, $fg || 1);
+    }
+  } else {
+    ($_fg, $_bg) = ($fg, $bg);
+  }
+
+  push @classes, "fg-$COLORS[$_fg]" if defined $_fg and $COLORS[$_fg];
+  push @classes, "bg-$COLORS[$_bg]" if defined $_bg and $COLORS[$_bg];
+  push @classes, "bold" if $b;
+  push @classes, "ul" if $u;
+  return join " ", @classes;
+}
+
 sub parse {
-  my ($string, $italic) = @_;
+  my ($string, $italic, $classes) = @_;
 
   $italic_invert = 1 if $italic;
+  $use_classes = 1 if $classes;
+  _encode_entities(\$string);
 
   my $text = join "\n",
        map {_parse_formatted_string($_)}
-       split "\n", _encode_entities($string);
+       split "\n", $string;
 
   $italic_invert = 0;
+  $use_classes = 0;
 
   return $text;
 }
 
 sub _encode_entities {
   my $string = shift;
-  return $string unless $string;
-  $string =~ s/&/&amp;/g;
-  $string =~ s/</&lt;/g;
-  $string =~ s/>/&gt;/g;
-  $string =~ s/"/&quot;/g;
-  return $string;
+  return unless $string;
+  $$string =~ s/&/&amp;/g;
+  $$string =~ s/</&lt;/g;
+  $$string =~ s/>/&gt;/g;
+  $$string =~ s/"/&quot;/g;
 }
 
 1;
