@@ -17,8 +17,8 @@ our $RESET     = "\017";
 our $INVERSE   = "\026";
 our $UNDERLINE = "\037";
 
-our $COLOR_SEQUENCE    = qr/(\d{1,2})(?:,(\d{1,2}))?/;
-my $COLOR_SEQUENCE_NC = qr/\d{1,2}(?:,\d{1,2})?/;
+our $COLOR_SEQUENCE    = qr/([0-9]{1,2})(?:,([0-9]{1,2}))?/;
+my $COLOR_SEQUENCE_NC = qr/[0-9]{1,2}(?:,[0-9]{1,2})?/;
 our $FORMAT_SEQUENCE   = qr/(
       $BOLD
     | $COLOR$COLOR_SEQUENCE_NC?  | $RESET
