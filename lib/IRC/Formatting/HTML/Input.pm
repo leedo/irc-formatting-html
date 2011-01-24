@@ -25,6 +25,7 @@ sub parse {
   $irctext =~ s/\n{2,}/\n/;
   $irctext =~ s/^\n+//;
   $irctext =~ s/\n+$//;
+  $irctext =~ s/$FORMAT_SEQUENCE*$//i;
   return $irctext;
 }
 
@@ -101,6 +102,12 @@ sub _tag_start {
       $state->{fg} = $color;
       $irctext .= $COLOR.$color;
       $irctext .=",$state->{bg}" if length $state->{bg};
+    }
+    # WTF, wysihat sets this as the color when it is "reset"
+    elsif ($attr->{color} eq "#00000000") {
+      $state->{fg} = "";
+      $state->{bg} = "";
+      $irctext .= $COLOR;
     }
   }
 

@@ -34,8 +34,8 @@ my @colors_dec = do { map {hex_color_to_dec($_)} @COLORS };
 sub html_color_to_irc {
   my $color = shift;
   my $rgb;
-  if ($color =~ /^#?[a-f0-9]+$/i) {
-    $rgb = hex_color_to_dec($color);
+  if ($color =~ /^#?([a-f0-9]{6}|[a-f0-9]{3})$/i) {
+    $rgb = hex_color_to_dec($1);
   } elsif ($color =~ /^rgb/) {
     $rgb = rgb_str_to_dec($color);
   }
